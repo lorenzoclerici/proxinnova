@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Operazione Leva x2 | Proxinnova</title>
+<meta name="description" content="Operazione Leva x2: usa la liquidità della tua azienda come leva. 100.000 € di liquidità possono diventare fino a 200.000 € di capacità finanziaria. Verifica in 1 minuto se la tua azienda è idonea.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#121a17">
+<meta property="og:title" content="Raddoppia la tua capacità finanziaria | Proxinnova">
+<meta property="og:description" content="Operazione Leva x2: 100.000 € di liquidità possono diventare fino a 200.000 € di capacità finanziaria.">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!--
+=====================================================================
+ CONFIGURAZIONE RAPIDA  (tutto il resto è già pronto)
+ - WEBHOOK_URL / META_PIXEL_ID / PRIVACY_URL: in fondo al file, oggetto CONFIG
+ - Soglie di idoneità: in fondo al file, array QUESTIONS (campo "out: true"
+   sulle risposte che escludono l'azienda) e testi in OUT.
+=====================================================================
+-->
+
+<style>
+:root{
+  --bg:#121a17; --bg-2:#18231f; --panel:#1e2c27; --line:rgba(236,230,220,.14);
+  --cream:#ece6dc; --paper:#f5f2eb; --ink:#16211d; --ink-2:#4b5851;
+  --muted:#a8b2ab; --lime:#e1f27a; --lime-d:#c9de55; --red:#a63a2c;
+  --font-h:'Inter Tight','Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-b:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--bg);color:var(--cream);font:400 1rem/1.6 var(--font-b);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+h1,h2,h3,p,ul{margin:0}
+ul{padding:0;list-style:none}
+.wrap{width:min(1120px,100% - 40px);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-60px;background:var(--lime);color:var(--ink);padding:10px 14px;border-radius:10px;font-weight:600;z-index:100;text-decoration:none}
+.skip:focus{top:12px}
+:focus-visible{outline:3px solid var(--lime);outline-offset:3px;border-radius:6px}
+
+/* ---------- Tipografia ---------- */
+h1,h2,h3{font-family:var(--font-h);font-weight:800;letter-spacing:-.035em;text-wrap:balance}
+h1{font-size:clamp(2.6rem,10.4vw,5.1rem);line-height:.98}
+h1 em{font-style:normal;color:var(--lime)}
+h2{font-size:clamp(1.9rem,6vw,3.1rem);line-height:1.04}
+.eyebrow{display:flex;align-items:center;gap:14px;font-size:.72rem;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:22px}
+.eyebrow i{display:block;width:44px;height:2px;background:var(--lime);flex:none}
+.lead{font-size:clamp(1.05rem,3.4vw,1.3rem);line-height:1.5;color:#d8d2c7;max-width:34ch}
+.lead b{color:var(--cream);font-weight:600}
+
+/* ---------- Bottoni ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:56px;padding:0 28px;border:0;border-radius:999px;background:var(--lime);color:var(--ink);font:700 .98rem/1.2 var(--font-b);text-decoration:none;cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s;text-align:center}
+.btn:hover{background:#eefa92;transform:translateY(-1px);box-shadow:0 10px 30px rgba(225,242,122,.22)}
+.btn:active{transform:none}
+.btn .ico{width:20px;height:20px;flex:none}
+.btn.dark{background:var(--ink);color:var(--paper)}
+.btn.dark:hover{background:#243630;box-shadow:0 10px 24px rgba(22,33,29,.25)}
+.btn.ghost{background:transparent;border:1.5px solid rgba(22,33,29,.28);color:var(--ink)}
+.btn.ghost:hover{background:rgba(22,33,29,.06);box-shadow:none}
+.btn[disabled]{opacity:.65;cursor:progress;transform:none;box-shadow:none}
+.btn.block{width:100%}
+.ico{display:inline-flex}
+.ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Header ---------- */
+.top{position:relative;z-index:5}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.brand{display:inline-flex;align-items:center;text-decoration:none}
+.brand img{display:block;height:28px;width:auto}
+.top-link{font-size:.85rem;font-weight:600;text-decoration:none;color:var(--cream);border:1px solid var(--line);padding:9px 16px;border-radius:999px;transition:border-color .15s,background .15s}
+.top-link:hover{border-color:var(--lime);background:rgba(225,242,122,.08)}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;
+  background:
+   radial-gradient(900px 520px at 88% 12%,rgba(201,164,92,.17),transparent 62%),
+   radial-gradient(720px 420px at 0% 0%,rgba(225,242,122,.07),transparent 60%),
+   linear-gradient(180deg,#17231f 0%,#121a17 100%)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.hero-grid{position:relative;z-index:2;display:grid;gap:32px;padding:28px 0 36px}
+.hero-copy{position:relative;z-index:2}
+.hero h1{margin-bottom:22px}
+.reqs{margin:28px 0;border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;background:rgba(255,255,255,.035);max-width:520px;backdrop-filter:blur(4px)}
+.reqs-title{font-size:.7rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.reqs li{display:flex;gap:12px;align-items:baseline;font-size:.97rem;line-height:1.4;padding:6px 0}
+.reqs li+li{border-top:1px solid var(--line)}
+.reqs b{color:var(--lime);font-weight:700;white-space:nowrap;min-width:7.2em}
+.cta-row{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.micro{font-size:.84rem;color:var(--muted)}
+
+.hero-visual{position:absolute;z-index:1;right:-9vw;top:34px;opacity:.2;pointer-events:none;user-select:none}
+.x2{font:900 46vw/.8 var(--font-h);letter-spacing:-.06em;display:inline-flex;align-items:flex-end;
+  background:linear-gradient(135deg,#fff4cc 0%,#e7cb85 20%,#b48a3e 46%,#f0d995 62%,#8a6428 82%,#5a3f14 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 26px 34px rgba(0,0,0,.55))}
+.x2 .x{font-size:.62em;margin-right:-.02em}
+.plinth{display:none}
+
+.pillars{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);padding:22px 0 26px}
+.pillar{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:0 6px;font-size:.66rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;line-height:1.35;color:#cfc9be}
+.pillar+.pillar{border-left:1px solid var(--line)}
+.pillar .ico{width:44px;height:44px;border:1.5px solid rgba(225,242,122,.6);border-radius:50%;padding:11px;color:var(--lime)}
+
+/* ---------- Sezioni ---------- */
+section{position:relative}
+.sec{padding:clamp(56px,10vw,112px) 0}
+.sec-head{max-width:720px;margin-bottom:36px}
+.sec-head p{margin-top:16px;color:#cfc9be;font-size:1.05rem;max-width:56ch}
+
+/* Come funziona */
+.steps{display:grid;gap:14px}
+.step-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px 22px}
+.step-card .n{font:800 2.4rem/1 var(--font-h);letter-spacing:-.04em;color:var(--lime);margin-bottom:14px}
+.step-card h3{font-size:1.28rem;letter-spacing:-.025em;margin-bottom:8px}
+.step-card p{color:#cfc9be;font-size:.98rem}
+.example{margin-top:14px;border:1px solid var(--line);border-radius:20px;padding:24px 22px;background:linear-gradient(160deg,rgba(201,164,92,.1),transparent 55%),var(--bg-2)}
+.example h3{font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;font-family:var(--font-b)}
+.bar-row{margin-bottom:18px}
+.bar-row:last-of-type{margin-bottom:0}
+.bar-label{display:flex;justify-content:space-between;gap:12px;font-size:.9rem;color:#cfc9be;margin-bottom:8px;flex-wrap:wrap}
+.bar-label b{font:800 1.35rem/1 var(--font-h);letter-spacing:-.03em;color:var(--cream)}
+.bar{height:14px;border-radius:999px;background:rgba(236,230,220,.08);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8a6428,#e7cb85)}
+.bar.full i{background:var(--lime)}
+.example .note{margin-top:20px;font-size:.8rem;color:var(--muted);line-height:1.5}
+
+/* Per chi è */
+.fit{background:var(--cream);color:var(--ink)}
+.fit .sec-head p{color:var(--ink-2)}
+.fit-grid{display:grid;gap:14px}
+.fit-card{background:var(--paper);border-radius:22px;padding:26px 22px;border:1px solid rgba(22,33,29,.08)}
+.fit-card h3{font-size:1.25rem;letter-spacing:-.025em;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.fit-card li{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:1px solid rgba(22,33,29,.09);font-size:.98rem;line-height:1.45}
+.fit-card li .ico{flex:none;width:22px;height:22px;border-radius:50%;padding:4px;margin-top:1px}
+.fit-card.yes li .ico{background:var(--ink);color:var(--lime)}
+.fit-card.no li .ico{background:rgba(166,58,44,.12);color:var(--red)}
+.fit-card.no h3{color:#4b3733}
+.fit-foot{margin-top:18px;font-size:.88rem;color:var(--ink-2);max-width:70ch}
+
+/* Quiz */
+.verify{background:
+  radial-gradient(800px 480px at 12% 0%,rgba(225,242,122,.07),transparent 60%),
+  linear-gradient(180deg,#121a17,#18231f)}
+.verify-grid{display:grid;gap:34px;align-items:start}
+.verify-copy .lead{max-width:44ch;margin:18px 0 26px}
+.checks li{display:flex;gap:12px;align-items:center;padding:7px 0;color:#d8d2c7}
+.checks .ico{width:22px;height:22px;color:var(--lime);flex:none}
+.quiz{background:var(--paper);color:var(--ink);border-radius:26px;padding:20px 18px 24px;box-shadow:0 34px 90px rgba(0,0,0,.5);width:100%;max-width:600px;margin-inline:auto;scroll-margin-top:72px}
+.q-head{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:10px}
+.q-count{font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.q-back{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:6px 8px 6px 0;font:600 .88rem var(--font-b);color:var(--ink);cursor:pointer;border-radius:8px}
+.q-back .ico{width:18px;height:18px;transform:scaleX(-1)}
+.q-back:hover{text-decoration:underline}
+.q-back[hidden]{display:none}
+.progress{height:6px;background:rgba(22,33,29,.1);border-radius:999px;overflow:hidden;margin-bottom:24px}
+.progress i{display:block;height:100%;width:0;background:var(--ink);border-radius:inherit;transition:width .35s ease}
+.quiz[data-mode=out] .q-head,.quiz[data-mode=done] .q-head,.quiz[data-mode=out] .progress,.quiz[data-mode=done] .progress{display:none}
+.quiz[data-mode=out],.quiz[data-mode=done]{padding-top:28px}
+.step{animation:in .28s ease both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.quiz h3{font-size:clamp(1.4rem,5vw,1.75rem);line-height:1.12;letter-spacing:-.03em;margin-bottom:8px;outline:none}
+.hint{font-size:.94rem;color:var(--ink-2);margin-bottom:18px;line-height:1.5}
+.opts{display:grid;gap:10px;margin-top:18px}
+.hint+.opts{margin-top:0}
+.opt{position:relative;display:flex;align-items:center;gap:14px;min-height:58px;padding:12px 16px;background:#fff;border:1.5px solid rgba(22,33,29,.16);border-radius:16px;cursor:pointer;transition:border-color .15s,background .15s,transform .1s;font-weight:500;line-height:1.3;-webkit-tap-highlight-color:transparent}
+.opt:hover{border-color:rgba(22,33,29,.5)}
+.opt:active{transform:scale(.995)}
+.opt input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.opt .dot{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid rgba(22,33,29,.35);background:#fff;transition:.15s}
+.opt input:checked ~ .dot{border-color:var(--ink);background:var(--ink);box-shadow:inset 0 0 0 4px #fff}
+.opt:has(input:checked){border-color:var(--ink);background:#eef6b4}
+.opt input:focus-visible ~ .dot{outline:3px solid var(--ink);outline-offset:3px}
+
+.field{margin-bottom:16px}
+.field label.lbl{display:block;font-size:.86rem;font-weight:600;margin-bottom:7px}
+.field input[type=text],.field input[type=email],.field input[type=tel]{width:100%;height:54px;padding:0 16px;border:1.5px solid rgba(22,33,29,.22);border-radius:14px;background:#fff;color:var(--ink);font:500 1rem var(--font-b);transition:border-color .15s,box-shadow .15s}
+.field input::placeholder{color:#8a948d}
+.field input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px rgba(225,242,122,.7)}
+.field.bad input{border-color:var(--red);box-shadow:0 0 0 3px rgba(166,58,44,.12)}
+.err{min-height:0;font-size:.84rem;color:var(--red);font-weight:500;margin-top:6px}
+.err:empty{display:none}
+.trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.chk{display:flex;gap:12px;align-items:flex-start;font-size:.86rem;line-height:1.45;color:var(--ink-2);cursor:pointer;margin-bottom:6px}
+.chk input{position:absolute;opacity:0}
+.chk .box{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid rgba(22,33,29,.4);background:#fff;margin-top:1px;display:grid;place-items:center;transition:.15s}
+.chk .box svg{width:14px;height:14px;stroke:var(--lime);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.chk input:checked ~ .box{background:var(--ink);border-color:var(--ink)}
+.chk input:checked ~ .box svg{opacity:1}
+.chk input:focus-visible ~ .box{outline:3px solid var(--ink);outline-offset:3px}
+.chk a{color:var(--ink);font-weight:600}
+.chk-wrap{margin-bottom:14px}
+.form-err{margin:12px 0 0;padding:12px 14px;border-radius:12px;background:rgba(166,58,44,.1);color:var(--red);font-size:.9rem;font-weight:500}
+.form-err:empty{display:none}
+.actions{margin-top:20px}
+
+.state{text-align:left}
+.state-ico{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin-bottom:18px}
+.state-ico .ico{width:26px;height:26px}
+.state-ico.ok{background:var(--ink);color:var(--lime)}
+.state-ico.out{background:rgba(22,33,29,.08);color:var(--ink)}
+.state p{color:var(--ink-2);font-size:1rem;line-height:1.55;margin-bottom:14px}
+.state .fine{font-size:.88rem;padding:12px 14px;background:rgba(22,33,29,.05);border-radius:12px;margin-bottom:20px}
+.next{margin:18px 0 4px;display:grid;gap:12px}
+.next li{display:flex;gap:12px;align-items:flex-start;font-size:.95rem;color:var(--ink);line-height:1.4}
+.next li span.n{flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--lime);font:700 .8rem/26px var(--font-b);text-align:center}
+.debug{margin-top:16px;font:12px/1.5 ui-monospace,monospace;background:#0e1513;color:#b9d27a;border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-all}
+
+/* FAQ */
+.faq{background:var(--bg)}
+.faq-list{max-width:820px;display:grid;gap:10px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:16px}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 20px;font:600 1.02rem/1.35 var(--font-h);letter-spacing:-.01em;border-radius:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";flex:none;font:400 1.6rem/1 var(--font-b);color:var(--lime);transition:transform .2s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 20px 20px;color:#cfc9be;font-size:.98rem;max-width:64ch}
+
+/* Footer */
+.foot{border-top:1px solid var(--line);padding:40px 0 calc(40px + 84px);font-size:.82rem;color:var(--muted);background:#0e1513}
+.foot .brand{margin-bottom:18px}
+.foot .brand img{height:24px}
+.foot p{max-width:78ch;margin-bottom:10px}
+.foot a{color:var(--cream)}
+
+/* CTA sticky mobile */
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,transparent,rgba(18,26,23,.92) 38%);transform:translateY(120%);transition:transform .3s ease;pointer-events:none}
+.sticky.on{transform:none}
+.sticky .btn{pointer-events:auto;width:100%;box-shadow:0 12px 36px rgba(0,0,0,.45)}
+
+/* Banner cookie */
+.cookie{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;max-width:560px;margin-inline:auto;background:var(--paper);color:var(--ink);border-radius:18px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.5);font-size:.86rem;line-height:1.45}
+.cookie p{margin-bottom:12px}
+.cookie a{color:var(--ink);font-weight:600}
+.cookie div{display:flex;gap:10px}
+.cookie .btn{min-height:44px;padding:0 20px;font-size:.88rem;flex:1}
+
+/* ---------- Desktop ---------- */
+@media (min-width:700px){
+  .wrap{width:min(1120px,100% - 64px)}
+  .pillar{flex-direction:row;text-align:left;gap:16px;font-size:.74rem;padding:0 24px;justify-content:center}
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .fit-grid{grid-template-columns:1fr 1fr}
+  .fit-card{padding:30px 28px}
+  .quiz{padding:26px 28px 30px}
+  .step-card,.example{padding:28px 26px}
+  .bar-row{margin-bottom:0}
+  .bars{display:grid;gap:22px}
+}
+@media (min-width:960px){
+  .hero-grid{grid-template-columns:1.1fr .9fr;align-items:center;gap:40px;padding:56px 0 70px}
+  .hero-visual{position:relative;right:auto;top:auto;opacity:1;justify-self:center;display:flex;flex-direction:column;align-items:center;padding-bottom:20px}
+  .x2{font-size:clamp(14rem,24vw,22rem)}
+  .plinth{display:block;width:86%;height:22px;margin-top:14px;border-radius:8px;background:linear-gradient(180deg,#2e3f39,#16201c);box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 40px 70px rgba(0,0,0,.6)}
+  .pillar{font-size:.78rem}
+  .verify-grid{grid-template-columns:.9fr 1.1fr;gap:64px;align-items:center}
+  .verify-copy{position:sticky;top:96px}
+  .sticky{display:none}
+  .foot{padding-bottom:40px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#verifica">Vai alla verifica di idoneità</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Proxinnova"><img src="assets/logo-proxinnova.png" alt="Proxinnova" width="132" height="28"></a>
+    <a class="top-link" href="#verifica">Verifica idoneità</a>
+  </div>
+</header>
+
+<main>
+<!-- ============================ HERO ============================ -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow"><i></i>Operazione Leva x2</p>
+      <h1>Raddoppia la tua <em>capacità finanziaria.</em></h1>
+      <p class="lead">Con Operazione Leva x2, <b>100.000&nbsp;€ di liquidità</b> possono diventare <b>fino a 200.000&nbsp;€</b> di capacità finanziaria.</p>
+
+      <div class="reqs">
+        <p class="reqs-title">Riservata ad aziende con</p>
+        <ul>
+          <li><b>1 milione €</b><span>di fatturato annuo</span></li>
+          <li><b>100.000 €</b><span>di liquidità propria da destinare a garanzia</span></li>
+          <li><b>Opera in</b><span>Lombardia, Lazio, Campania o Sicilia</span></li>
+        </ul>
+      </div>
+
+      <div class="cta-row">
+        <a class="btn" id="heroCta" href="#verifica">Verifica se la tua azienda è idonea
+          <span class="ico" style="width:20px;height:20px"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+        <p class="micro">4 domande · 1 minuto · nessun impegno</p>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="x2"><span class="x">x</span><span>2</span></div>
+      <div class="plinth"></div>
+    </div>
+  </div>
+
+  <div class="wrap pillars">
+    <div class="pillar"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20V9"/></svg></span><span>Maggiore capacità<br>di investimento</span></div>
+    <div class="pillar"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg></span><span>Soluzione<br>su misura</span></div>
+    <div class="pillar"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="m9 12 2 2 4-4"/></svg></span><span>Percorso sicuro<br>e trasparente</span></div>
+  </div>
+</section>
+
+<!-- ======================== COME FUNZIONA ======================== -->
+<section class="sec" id="come-funziona">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow"><i></i>Il meccanismo</p>
+      <h2>Come funziona. Senza giri di parole.</h2>
+      <p>Operazione Leva x2 è una struttura finanziaria dedicata alle aziende che vogliono usare la propria liquidità come leva per ottenere nuova finanza. Accessibile attraverso i canali e i rapporti bancari di Proxinnova, pensata per sostenere investimenti, sviluppo e crescita.</p>
+    </div>
+
+    <div class="steps">
+      <article class="step-card">
+        <div class="n">01</div>
+        <h3>Parti dalla tua liquidità</h3>
+        <p>Una quota della liquidità aziendale viene destinata a garanzia dell'operazione. È il punto di partenza: senza liquidità propria, l'operazione non è accessibile.</p>
+      </article>
+      <article class="step-card">
+        <div class="n">02</div>
+        <h3>L'istituto valuta l'azienda</h3>
+        <p>Attraverso i canali bancari di Proxinnova, l'operazione viene sottoposta alla valutazione del merito creditizio e alle condizioni dell'istituto bancario.</p>
+      </article>
+      <article class="step-card">
+        <div class="n">03</div>
+        <h3>Nuova capacità finanziaria</h3>
+        <p>Fino al doppio della liquidità destinata a garanzia, per sostenere investimenti, sviluppo e crescita dell'azienda.</p>
+      </article>
+    </div>
+
+    <div class="example">
+      <h3>Un esempio, in numeri</h3>
+      <div class="bars">
+        <div class="bar-row">
+          <div class="bar-label"><span>Liquidità destinata a garanzia</span><b>100.000 €</b></div>
+          <div class="bar"><i style="width:50%"></i></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label"><span>Capacità finanziaria</span><b>fino a 200.000 €</b></div>
+          <div class="bar full"><i style="width:100%"></i></div>
+        </div>
+      </div>
+      <p class="note">Esempio illustrativo. Importi e condizioni effettivi variano in base al profilo dell'azienda e sono soggetti a valutazione del merito creditizio e alle condizioni dell'istituto bancario.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= PER CHI È ========================= -->
+<section class="sec fit" id="requisiti">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow" style="color:var(--ink-2)"><i style="background:var(--ink)"></i>Requisiti</p>
+      <h2>Questa operazione non è per tutti.</h2>
+      <p>Meglio dirlo subito: il tuo tempo vale quanto il nostro. Se rientri nei requisiti, ne parliamo. Se no, ti risparmi una telefonata.</p>
+    </div>
+
+    <div class="fit-grid">
+      <article class="fit-card yes">
+        <h3>È per te se…</h3>
+        <ul>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span>il fatturato annuo dell'azienda è di <b>almeno 1.000.000 €</b></span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span>hai <b>almeno 100.000 € di liquidità propria</b> da destinare a garanzia</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span>l'azienda è operativa <b>da almeno 2 anni</b></span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span>l'azienda opera in <b>Lombardia, Lazio, Campania o Sicilia</b></span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span><span>vuoi sostenere investimenti, sviluppo e crescita</span></li>
+        </ul>
+      </article>
+      <article class="fit-card no">
+        <h3>Non fa per te se…</h3>
+        <ul>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span>sei una startup o un'azienda neocostituita</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span>il fatturato annuo è inferiore a 1 milione di euro</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span>non hai liquidità propria e cerchi liquidità immediata</span></li>
+          <li><span class="ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span><span>l'azienda non opera in nessuna di queste quattro regioni</span></li>
+        </ul>
+      </article>
+    </div>
+    <p class="fit-foot">L'idoneità finale dipende da requisiti economico-finanziari verificati in fase di consulenza e dalla valutazione dell'istituto bancario.</p>
+  </div>
+</section>
+
+<!-- ========================== QUIZ ========================== -->
+<section class="sec verify" id="verifica-wrap">
+  <div class="wrap verify-grid">
+    <div class="verify-copy">
+      <p class="eyebrow"><i></i>Verifica idoneità</p>
+      <h2>4 domande. Un minuto. Poi sai se ci siamo.</h2>
+      <p class="lead">Rispondi sui requisiti dell'azienda. Se rientri, ti chiediamo i riferimenti e un consulente Proxinnova ti ricontatta. Se non rientri, te lo diciamo subito, senza raccogliere i tuoi dati.</p>
+      <ul class="checks">
+        <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>Esito preliminare immediato</li>
+        <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>Nessun impegno</li>
+        <li><span class="ico"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></span>Dati usati esclusivamente per ricontattarti</li>
+      </ul>
+    </div>
+
+    <form class="quiz" id="verifica" data-mode="step" novalidate aria-label="Verifica di idoneità">
+      <div class="q-head">
+        <button type="button" class="q-back" id="back" hidden><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>Indietro</button>
+        <span class="q-count" id="count" aria-live="polite"></span>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Avanzamento" aria-valuemin="0" aria-valuemax="6" aria-valuenow="1"><i id="bar"></i></div>
+      <div id="stage"></div>
+      <noscript><p class="hint">Per verificare l'idoneità online è necessario abilitare JavaScript.</p></noscript>
+    </form>
+  </div>
+</section>
+
+<!-- ========================== FAQ ========================== -->
+<section class="sec faq" id="faq">
+  <div class="wrap">
+    <div class="sec-head"><h2>Domande frequenti.</h2></div>
+    <div class="faq-list">
+      <details>
+        <summary>Serve avere già liquidità in azienda?</summary>
+        <p>Sì. L'operazione richiede una disponibilità finanziaria propria, da destinare a garanzia, di almeno 100.000 €. Se l'azienda non dispone di questa liquidità, non ha senso procedere con questa specifica soluzione.</p>
+      </details>
+      <details>
+        <summary>A quali aziende è rivolta?</summary>
+        <p>Ad aziende operative da almeno 2 anni, con un fatturato annuo di almeno 1.000.000 €, che operano in Lombardia, Lazio, Campania o Sicilia e con determinati requisiti economico-finanziari. Non è pensata per startup o società neocostituite.</p>
+      </details>
+      <details>
+        <summary>L'accesso all'operazione è garantito?</summary>
+        <p>No. L'operazione è soggetta a valutazione del merito creditizio e alle condizioni dell'istituto bancario. Proxinnova opera attraverso i propri canali e rapporti bancari.</p>
+      </details>
+      <details>
+        <summary>Perché chiedete tante informazioni prima di ricontattarmi?</summary>
+        <p>Perché il tuo tempo vale quanto il nostro. Con poche domande capiamo subito se l'operazione è adatta alla tua azienda e ti evitiamo una telefonata inutile.</p>
+      </details>
+      <details>
+        <summary>Cosa succede dopo aver compilato il modulo?</summary>
+        <p>Un consulente Proxinnova verifica i dati inseriti e, se l'azienda rientra nei requisiti, ti ricontatta per una consulenza dedicata. Compilare il modulo non ti impegna a nulla.</p>
+      </details>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Proxinnova"><img src="assets/logo-proxinnova.png" alt="Proxinnova" width="114" height="24" loading="lazy"></a>
+    <p>Operazione soggetta a valutazione del merito creditizio e alle condizioni dell'istituto bancario. Gli importi indicati sono esemplificativi: condizioni e capacità finanziaria effettive variano in base al profilo dell'azienda.</p>
+    <p>[Ragione sociale · P.IVA · Sede legale — da completare]</p>
+    <p><a id="privacyLink" href="#" target="_blank" rel="noopener">Informativa privacy</a></p>
+  </div>
+</footer>
+
+<div class="sticky" id="sticky" aria-hidden="true">
+  <a class="btn" href="#verifica" tabindex="-1">Verifica se la tua azienda è idonea</a>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   CONFIGURAZIONE
+   ===================================================================== */
+const CONFIG = {
+  // Endpoint che riceve i lead QUALIFICATI (Make, Zapier, n8n, Google Apps Script, CRM...).
+  // Viene inviato un POST application/x-www-form-urlencoded con campi piatti (vedi buildPayload).
+  // Se vuoto: modalità demo, il payload viene solo scritto in console.
+  WEBHOOK_URL: '',
+
+  // ID del Pixel Meta. Se vuoto il pixel non viene caricato e il banner cookie non compare.
+  // L'evento standard "Lead" parte SOLO per i lead qualificati.
+  META_PIXEL_ID: '',
+
+  // URL informativa privacy (obbligatorio per la raccolta dati).
+  PRIVACY_URL: '#',
+
+  // Opzionale: pagina di ringraziamento esterna. Se vuoto, mostra la conferma nella pagina.
+  REDIRECT_URL: ''
+};
+
+/* =====================================================================
+   DOMANDE E REGOLE DI IDONEITÀ
+   "out: true" = risposta che esclude l'azienda: il quiz si ferma subito,
+   NON vengono raccolti dati personali e non parte nessun lead.
+   ===================================================================== */
+const QUESTIONS = [
+  { id:'region', title:"In quale regione opera l'azienda?",
+    hint:'Al momento operiamo in queste quattro regioni.',
+    options:[ {label:'Lombardia'}, {label:'Lazio'}, {label:'Campania'}, {label:'Sicilia'}, {label:'Altra regione', out:true} ] },
+  { id:'years', title:"Da quanti anni è operativa l'azienda?",
+    options:[ {label:'Meno di 2 anni', out:true}, {label:'Da 2 a 3 anni'}, {label:'Da 3 a 5 anni'}, {label:'Oltre 5 anni'} ] },
+  { id:'revenue', title:"Qual è il fatturato annuo dell'azienda?",
+    options:[ {label:'Inferiore a 500.000 €', out:true}, {label:'Da 500.000 € a 999.999 €', out:true},
+              {label:'Da 1.000.000 € a 2.000.000 €'}, {label:'Da 2.000.000 € a 5.000.000 €'}, {label:'Superiore a 5.000.000 €'} ] },
+  { id:'liquidity', title:"Qual è la disponibilità liquida attuale dell'azienda?",
+    hint:"Liquidità propria che l'azienda potrebbe destinare a garanzia dell'operazione.",
+    options:[ {label:'Inferiore a 100.000 €', out:true}, {label:'Da 100.000 € a 199.999 €'},
+              {label:'Da 200.000 € a 499.999 €'}, {label:'Da 500.000 € in su'} ] }
+];
+
+// Messaggi mostrati quando una risposta esclude l'azienda
+const OUT = {
+  region:   { title:'Per ora non operiamo nella tua regione.',
+              text:'Operazione Leva x2 è attualmente disponibile per aziende che operano in Lombardia, Lazio, Campania e Sicilia.' },
+  years:    { title:"L'azienda è ancora troppo giovane per questa operazione.",
+              text:'Operazione Leva x2 è riservata ad aziende operative da almeno 2 anni.' },
+  revenue:  { title:'Il fatturato è sotto la soglia minima.',
+              text:"Operazione Leva x2 è pensata per aziende con un fatturato annuo di almeno 1.000.000 €." },
+  liquidity:{ title:'Serve più liquidità propria.',
+              text:"L'operazione richiede una disponibilità liquida propria di almeno 100.000 €, da destinare a garanzia. Senza questa base non possiamo procedere." }
+};
+
+// Livello del lead per la priorità di richiamo (A = più forte)
+const TOP_REVENUE = ['Da 2.000.000 € a 5.000.000 €','Superiore a 5.000.000 €'];
+const TOP_LIQUIDITY = ['Da 200.000 € a 499.999 €','Da 500.000 € in su'];
+
+/* =====================================================================
+   UTILITY
+   ===================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const h = (tag, attrs = {}, ...kids) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k === 'text') el.textContent = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, '');
+    else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) { if (kid != null && kid !== false) el.append(kid); }
+  return el;
+};
+
+const ICONS = {
+  check: '<path d="m5 12.5 4.5 4.5L19 7"/>',
+  minus: '<path d="M6 12h12"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>'
+};
+const ico = (name) => { const s = h('span', { class: 'ico', 'aria-hidden': 'true' }); s.innerHTML = `<svg viewBox="0 0 24 24">${ICONS[name]}</svg>`; return s; };
+
+const store = {
+  get(k){ try { return sessionStorage.getItem(k); } catch(e){ return null; } },
+  set(k,v){ try { sessionStorage.setItem(k,v); } catch(e){} }
+};
+const cookie = (n) => {
+  try { return (document.cookie.match(new RegExp('(?:^|; )' + n + '=([^;]*)')) || [])[1] || ''; }
+  catch (e) { return ''; }   // cookie bloccati (browser in-app, privacy): il form deve funzionare comunque
+};
+
+/* ---------- Validazioni ---------- */
+function vatOk(v) {            // Partita IVA italiana: 11 cifre + cifra di controllo
+  if (!/^\d{11}$/.test(v)) return false;
+  let s = 0;
+  for (let i = 0; i < 11; i++) { let d = +v[i]; if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; } s += d; }
+  return s % 10 === 0;
+}
+function phoneNorm(v) {
+  let p = v.replace(/[\s.\-()]/g, '');
+  p = p.replace(/^(\+|00)39/, '');
+  return p;
+}
+const RULES = {
+  company: v => v.trim().length >= 2 || "Inserisci la denominazione dell'azienda.",
+  vat:     v => vatOk(v.replace(/\s/g, '')) || 'Partita IVA non valida: controlla le 11 cifre.',
+  name:    v => /\S{2,}\s+\S{2,}/.test(v.trim()) || 'Inserisci nome e cognome.',
+  email:   v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) || 'Inserisci un indirizzo e-mail valido.',
+  phone:   v => /^(3\d{8,9}|0\d{5,10})$/.test(phoneNorm(v)) || 'Inserisci un numero di telefono italiano valido.'
+};
+
+/* ---------- Tracciamento ---------- */
+function initPixel() {
+  if (window.fbq || !CONFIG.META_PIXEL_ID) return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  window.fbq('init', CONFIG.META_PIXEL_ID);
+  window.fbq('track', 'PageView');
+}
+function track(name, params = {}, custom = true, eventID) {
+  try {
+    if (typeof window.fbq !== 'function') return;
+    if (custom) window.fbq('trackCustom', name, params);
+    else window.fbq('track', name, params, eventID ? { eventID } : undefined);
+  } catch (e) {}
+}
+function consentBanner() {
+  if (!CONFIG.META_PIXEL_ID) return;
+  let c = null; try { c = localStorage.getItem('px_consent'); } catch (e) {}
+  if (c === 'yes') return initPixel();
+  if (c === 'no') return;
+  const save = (v) => { try { localStorage.setItem('px_consent', v); } catch (e) {} box.remove(); if (v === 'yes') initPixel(); };
+  const box = h('div', { class: 'cookie', role: 'dialog', 'aria-label': 'Preferenze cookie' },
+    h('p', {}, 'Usiamo cookie di marketing (Meta Pixel) per misurare l’efficacia delle campagne. Puoi accettare o rifiutare. ',
+      h('a', { href: CONFIG.PRIVACY_URL, target: '_blank', rel: 'noopener' }, 'Informativa')),
+    h('div', {},
+      h('button', { type: 'button', class: 'btn ghost', onclick: () => save('no') }, 'Rifiuta'),
+      h('button', { type: 'button', class: 'btn dark', onclick: () => save('yes') }, 'Accetta')));
+  document.body.append(box);
+}
+
+/* ---------- Attribuzione (UTM / Meta) ---------- */
+const params = new URLSearchParams(location.search);
+const attribution = {};
+['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid'].forEach(k => {
+  const v = params.get(k) || store.get(k);
+  if (v) { attribution[k] = v; store.set(k, v); }
+});
+const DEBUG = params.has('debug');
+
+/* =====================================================================
+   QUIZ
+   ===================================================================== */
+const STEPS = [...QUESTIONS.map(q => ({ type: 'choice', q })), { type: 'company' }, { type: 'contact' }];
+const TOTAL = STEPS.length;
+const state = { i: 0, answers: {}, values: { company:'', vat:'', name:'', email:'', phone:'' }, blocked: [], busy: false, started: 0 };
+
+const card = $('#verifica'), stage = $('#stage'), barEl = $('#bar'), countEl = $('#count'), backBtn = $('#back');
+const progressEl = $('.progress');
+let fields = {};
+
+function reveal() {
+  const r = card.getBoundingClientRect();
+  if (r.top < 8 || r.top > innerHeight * 0.45) scrollTo({ top: scrollY + r.top - 76, behavior: reduce ? 'auto' : 'smooth' });
+}
+function focusHeading(view) {
+  const t = view.querySelector('[data-focus]');
+  if (t) t.focus({ preventScroll: true });
+}
+function go(n, { initial = false } = {}) {
+  state.i = Math.max(0, Math.min(TOTAL - 1, n));
+  state.busy = false;
+  render();
+  if (!initial) reveal();
+}
+
+function render() {
+  const s = STEPS[state.i];
+  card.dataset.mode = 'step';
+  stage.replaceChildren();
+  fields = {};
+  backBtn.hidden = state.i === 0;
+  countEl.textContent = s.type === 'choice' ? `Domanda ${state.i + 1} di ${QUESTIONS.length}` : (s.type === 'company' ? 'Quasi fatto' : 'Ultimo passo');
+  barEl.style.width = ((state.i + 1) / TOTAL * 100) + '%';
+  progressEl.setAttribute('aria-valuenow', state.i + 1);
+  const view = s.type === 'choice' ? viewChoice(s.q) : s.type === 'company' ? viewCompany() : viewContact();
+  view.classList.add('step');
+  stage.append(view);
+  if (state.i > 0 || state.started) focusHeading(view);
+  track('QuizStep', { step: s.type === 'choice' ? s.q.id : s.type });
+}
+
+/* ---------- Domande a scelta ---------- */
+function viewChoice(q) {
+  const name = 'q-' + q.id;
+  const list = h('div', { class: 'opts', role: 'radiogroup', 'aria-labelledby': 't-' + q.id });
+  let kbNav = false;
+  list.addEventListener('keydown', e => { if (e.key.startsWith('Arrow')) { kbNav = true; setTimeout(() => kbNav = false, 0); } });
+  q.options.forEach((o, idx) => {
+    const id = `${name}-${idx}`;
+    const input = h('input', { type: 'radio', name, id, value: o.label, checked: state.answers[q.id] === o.label });
+    input.addEventListener('click', () => { state.answers[q.id] = o.label; if (!kbNav) proceed(q, o); });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (input.checked) proceed(q, o); } });
+    list.append(h('label', { class: 'opt', for: id }, input, h('span', { class: 'dot', 'aria-hidden': 'true' }), h('span', { text: o.label })));
+  });
+  return h('div', {},
+    h('h3', { id: 't-' + q.id, tabindex: '-1', 'data-focus': true, text: q.title }),
+    q.hint ? h('p', { class: 'hint', text: q.hint }) : null,
+    list,
+    h('p', { class: 'sr', text: 'Seleziona una risposta e premi Invio per continuare.' }));
+}
+
+function proceed(q, o) {
+  if (state.busy) return;
+  state.busy = true;
+  if (!state.started) state.started = Date.now();
+  if (o.out) {
+    if (!state.blocked.includes(q.id)) state.blocked.push(q.id);
+    track('QuizDisqualified', { reason: q.id, answer: o.label });
+    setTimeout(() => showOut(q), 220);
+  } else {
+    setTimeout(() => go(state.i + 1), 220);
+  }
+}
+
+function showOut(q) {
+  const m = OUT[q.id];
+  card.dataset.mode = 'out';
+  const view = h('div', { class: 'state step' },
+    h('div', { class: 'state-ico out' }, ico('minus')),
+    h('h3', { tabindex: '-1', 'data-focus': true, text: m.title }),
+    h('p', { text: m.text }),
+    h('p', { class: 'fine', text: 'Non abbiamo raccolto nessun dato personale: non ti chiameremo per qualcosa che non possiamo offrirti.' }),
+    h('button', { type: 'button', class: 'btn ghost block', onclick: () => { delete state.answers[q.id]; go(state.i); } }, 'Ho sbagliato risposta'));
+  stage.replaceChildren(view);
+  focusHeading(view);
+  reveal();
+}
+
+/* ---------- Campi di testo ---------- */
+function field({ id, label, type = 'text', placeholder = '', autocomplete = 'off', inputmode, maxlength }) {
+  const input = h('input', { type, id: 'f-' + id, name: id, placeholder, autocomplete, inputmode, maxlength, value: state.values[id] || '', 'aria-describedby': 'e-' + id });
+  const err = h('p', { class: 'err', id: 'e-' + id, role: 'alert' });
+  const el = h('div', { class: 'field' }, h('label', { class: 'lbl', for: 'f-' + id, text: label }), input, err);
+  input.addEventListener('input', () => { state.values[id] = input.value; if (el.classList.contains('bad')) check(id); });
+  input.addEventListener('blur', () => { if (input.value) check(id); });
+  fields[id] = { el, input, err };
+  return el;
+}
+function check(id) {
+  const f = fields[id]; const r = RULES[id](f.input.value);
+  const ok = r === true;
+  f.el.classList.toggle('bad', !ok);
+  f.input.setAttribute('aria-invalid', String(!ok));
+  f.err.textContent = ok ? '' : r;
+  return ok;
+}
+function checkAll(ids) {
+  let first = null;
+  ids.forEach(id => { if (!check(id) && !first) first = id; });
+  if (first) fields[first].input.focus();
+  return !first;
+}
+
+function viewCompany() {
+  return h('div', {},
+    h('h3', { tabindex: '-1', 'data-focus': true, text: 'La tua azienda rientra nei requisiti.' }),
+    h('p', { class: 'hint', text: "In base alle risposte, l'azienda ha i requisiti preliminari. Indica i dati dell'azienda per proseguire." }),
+    field({ id: 'company', label: "Denominazione dell'azienda", placeholder: 'Es. Rossi S.r.l.', autocomplete: 'organization' }),
+    field({ id: 'vat', label: 'Partita IVA', placeholder: '11 cifre', inputmode: 'numeric', maxlength: 13 }),
+    h('div', { class: 'actions' }, h('button', { type: 'submit', class: 'btn dark block' }, 'Continua', ico('arrow'))));
+}
+
+function viewContact() {
+  const chk = (id, kids) => {
+    const input = h('input', { type: 'checkbox', id: 'c-' + id, 'aria-describedby': 'e-' + id });
+    const err = h('p', { class: 'err', id: 'e-' + id, role: 'alert' });
+    input.addEventListener('change', () => { err.textContent = ''; });
+    fields[id] = { input, err, checkbox: true };
+    return h('div', { class: 'chk-wrap' },
+      h('label', { class: 'chk', for: 'c-' + id }, input, h('span', { class: 'box', 'aria-hidden': 'true' }, (() => { const s = h('span'); s.style.display = 'contents'; s.innerHTML = '<svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg>'; return s; })()), h('span', {}, kids)),
+      err);
+  };
+  return h('div', {},
+    h('h3', { tabindex: '-1', 'data-focus': true, text: 'Ultimo passo: come ti contattiamo?' }),
+    h('p', { class: 'hint', text: 'I dati che inserirai verranno utilizzati esclusivamente per ricontattarti.' }),
+    field({ id: 'name', label: "Nome e cognome dell'amministratore o del referente", placeholder: 'Nome e cognome', autocomplete: 'name' }),
+    field({ id: 'email', label: 'E-mail', type: 'email', placeholder: 'nome@azienda.it', autocomplete: 'email', inputmode: 'email' }),
+    field({ id: 'phone', label: 'Numero di telefono', type: 'tel', placeholder: 'Es. 333 123 4567', autocomplete: 'tel', inputmode: 'tel' }),
+    h('div', { class: 'trap', 'aria-hidden': 'true' }, h('label', {}, 'Sito web', h('input', { type: 'text', id: 'f-website', name: 'website', tabindex: '-1', autocomplete: 'off' }))),
+    chk('understood', ["Ho compreso che l'operazione richiede ", h('b', {}, 'liquidità propria da destinare a garanzia (almeno 100.000 €)'), " ed è soggetta a valutazione del merito creditizio e alle condizioni dell'istituto bancario."]),
+    chk('privacy', ["Ho letto l'", h('a', { href: CONFIG.PRIVACY_URL, target: '_blank', rel: 'noopener' }, 'informativa privacy'), ' e acconsento al trattamento dei miei dati per essere ricontattato.']),
+    h('p', { class: 'form-err', id: 'formErr', role: 'alert' }),
+    h('div', { class: 'actions' }, h('button', { type: 'submit', class: 'btn block', id: 'submitBtn' }, 'Richiedi la verifica', ico('arrow'))));
+}
+
+/* ---------- Invio ---------- */
+function buildPayload() {
+  const a = state.answers, v = state.values;
+  const tier = TOP_REVENUE.includes(a.revenue) && TOP_LIQUIDITY.includes(a.liquidity) ? 'A' : 'B';
+  const fbc = cookie('_fbc') || (attribution.fbclid ? `fb.1.${Date.now()}.${attribution.fbclid}` : '');
+  return {
+    submitted_at: new Date().toISOString(),
+    event_id: (crypto.randomUUID ? crypto.randomUUID() : 'ev-' + Date.now() + '-' + Math.random().toString(16).slice(2)),
+    lead_status: 'Qualificato (prequalifica superata)',
+    lead_tier: tier,
+    full_name: v.name.trim(),
+    email: v.email.trim().toLowerCase(),
+    phone: phoneNorm(v.phone),
+    company_name: v.company.trim(),
+    vat_number: v.vat.replace(/\s/g, ''),
+    region: a.region,
+    years_active: a.years,
+    annual_revenue: a.revenue,
+    liquidity: a.liquidity,
+    retried_after_disqualification: state.blocked.length ? 'si' : 'no',
+    disqualified_on: state.blocked.join(','),
+    seconds_to_complete: state.started ? String(Math.round((Date.now() - state.started) / 1000)) : '',
+    consent_privacy: 'si',
+    consent_requirements_understood: 'si',
+    ...attribution,
+    fbp: cookie('_fbp'),
+    fbc,
+    page_url: location.href.split('#')[0]
+  };
+}
+async function send(p) {
+  if (!CONFIG.WEBHOOK_URL) {
+    console.info('[Landing · modalità demo] WEBHOOK_URL non impostato. Payload che verrebbe inviato:', p);
+    await new Promise(r => setTimeout(r, 500));
+    return;
+  }
+  await fetch(CONFIG.WEBHOOK_URL, {
+    method: 'POST', mode: 'no-cors', keepalive: true,
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+    body: new URLSearchParams(p).toString()
+  });
+}
+
+async function submitFinal() {
+  const okFields = checkAll(['name', 'email', 'phone']);
+  let okChecks = true;
+  [['understood', 'Per proseguire devi confermare di aver compreso i requisiti dell’operazione.'],
+   ['privacy', 'Per proseguire devi acconsentire al trattamento dei dati.']].forEach(([id, msg]) => {
+    if (!fields[id].input.checked) { fields[id].err.textContent = msg; if (okFields && okChecks) fields[id].input.focus(); okChecks = false; }
+  });
+  if (!okFields || !okChecks) return;
+
+  const btn = $('#submitBtn'), fe = $('#formErr');
+  fe.textContent = '';
+  const trap = $('#f-website');
+  btn.disabled = true; btn.firstChild.textContent = 'Invio in corso…';
+
+  let payload;
+  try {
+    payload = buildPayload();
+    if (trap && trap.value) { showDone(payload); return; }   // bot: finto successo, nessun invio
+    await send(payload);
+  } catch (e) {
+    console.error('[Landing] invio non riuscito', e);
+    btn.disabled = false; btn.firstChild.textContent = 'Richiedi la verifica';
+    fe.textContent = 'Non siamo riusciti a inviare la richiesta. Controlla la connessione e riprova.';
+    return;
+  }
+  track('Lead', { content_name: 'Operazione Leva x2', content_category: 'Tier ' + payload.lead_tier }, false, payload.event_id);
+  if (CONFIG.REDIRECT_URL) { location.href = CONFIG.REDIRECT_URL; return; }
+  showDone(payload);
+}
+
+function showDone(p) {
+  card.dataset.mode = 'done';
+  const first = p.full_name.split(/\s+/)[0];
+  const view = h('div', { class: 'state step' },
+    h('div', { class: 'state-ico ok' }, ico('check')),
+    h('h3', { tabindex: '-1', 'data-focus': true, text: 'Richiesta ricevuta.' }),
+    h('p', { text: `Grazie ${first}. Un consulente Proxinnova verificherà i dati di ${p.company_name} e ti ricontatterà al ${p.phone}.` }),
+    h('ul', { class: 'next' },
+      h('li', {}, h('span', { class: 'n' }, '1'), 'Verifichiamo i dati e i requisiti dell’azienda.'),
+      h('li', {}, h('span', { class: 'n' }, '2'), 'Ti contattiamo per una prima consulenza dedicata.'),
+      h('li', {}, h('span', { class: 'n' }, '3'), 'Valutiamo insieme se e come procedere, nel rispetto della valutazione dell’istituto bancario.')),
+    DEBUG ? h('pre', { class: 'debug', text: JSON.stringify(p, null, 2) }) : null);
+  stage.replaceChildren(view);
+  focusHeading(view);
+  reveal();
+}
+
+/* ---------- Eventi ---------- */
+card.addEventListener('submit', e => {
+  e.preventDefault();
+  const s = STEPS[state.i];
+  if (s.type === 'company') {
+    if (checkAll(['company', 'vat'])) { state.values.vat = state.values.vat.replace(/\s/g, ''); go(state.i + 1); }
+  } else if (s.type === 'contact') {
+    submitFinal();
+  }
+});
+backBtn.addEventListener('click', () => go(state.i - 1));
+
+/* =====================================================================
+   CTA STICKY (mobile) + AVVIO
+   ===================================================================== */
+const sticky = $('#sticky');
+const seen = { hero: true, form: false };
+const updateSticky = () => {
+  const on = !seen.hero && !seen.form;
+  sticky.classList.toggle('on', on);
+  sticky.setAttribute('aria-hidden', String(!on));
+  sticky.querySelector('a').tabIndex = on ? 0 : -1;
+};
+if ('IntersectionObserver' in window) {
+  new IntersectionObserver(([e]) => { seen.hero = e.isIntersecting; updateSticky(); }, { threshold: 0 }).observe($('#heroCta'));
+  new IntersectionObserver(([e]) => { seen.form = e.isIntersecting; updateSticky(); }, { threshold: 0.05 }).observe(card);
+}
+
+$('#privacyLink').href = CONFIG.PRIVACY_URL;
+consentBanner();
+go(0, { initial: true });
+})();
+</script>
+</body>
+</html>
