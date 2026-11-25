@@ -1,0 +1,7 @@
+Helvetica Now Display (Monotype) è un font a licenza: non è distribuibile via CDN gratuita.
+Copia qui i file web della vostra licenza con questi nomi esatti:
+  HelveticaNowDisplay-Regular.woff2   (peso 400)
+  HelveticaNowDisplay-Medium.woff2    (peso 500)
+  HelveticaNowDisplay-Bold.woff2      (peso 700)
+Finché mancano, la pagina usa Helvetica Now Display se installato sul dispositivo,
+altrimenti Helvetica Neue / Helvetica / Arial.
