@@ -814,8 +814,13 @@ const CONFIG = {
   WEBHOOK_URL: '',
 
   // ID del Pixel Meta. Se vuoto il pixel non viene caricato e il banner cookie non compare.
-  // L'evento standard "Lead" parte SOLO per i lead qualificati.
-  META_PIXEL_ID: '',
+  // L'evento standard "Lead" parte SOLO per i lead qualificati (nessuna thank you page:
+  // l'evento viene inviato dallo script nel momento in cui il modulo è stato inviato).
+  META_PIXEL_ID: '1168003358937856',
+
+  // false = il Pixel parte subito, senza banner cookie (scelta del cliente).
+  // true  = il Pixel parte solo dopo "Accetta" nel banner (consenso preventivo).
+  REQUIRE_CONSENT: false,
 
   // URL informativa privacy (obbligatorio per la raccolta dati).
   PRIVACY_URL: '#',
@@ -932,6 +937,7 @@ function track(name, params = {}, custom = true, eventID) {
 }
 function consentBanner() {
   if (!CONFIG.META_PIXEL_ID) return;
+  if (!CONFIG.REQUIRE_CONSENT) return initPixel();   // senza banner: il Pixel parte subito
   let c = null; try { c = localStorage.getItem('px_consent'); } catch (e) {}
   if (c === 'yes') return initPixel();
   if (c === 'no') return;
